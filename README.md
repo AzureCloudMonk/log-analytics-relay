@@ -8,7 +8,7 @@ Read more about this integration in our [introductory blog post](https://blogs.c
 
 # How to deploy the template
 
-Simply press the [Deploy to Azure](https://azuredeploy.net/) button above to launch the template within your own Azure Subscription.  You will be asked to provide settings as below.
+Simply press the [Deploy to Azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchef-partners%2Flog-analytics-relay%2Fmaster%2Fazuredeploy.json) button above to launch the template within your own Azure Subscription.  You will be asked to provide settings as below.
 
 ![Template Parameters](images/template_parameters1.png)
 
