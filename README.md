@@ -1,6 +1,6 @@
 # Log Analytics relay for Chef Automate
 
-[![Deploy to Azure](https://azuredeploy.net/deploybutton.svg)](https://azuredeploy.net/)
+[![Deploy to Azure](https%3A%2F%2Fraw.githubusercontent.com%2Fchef-partners%2Flog-analytics-relay%2Fmaster%2Fazuredeploy.json)](https://azuredeploy.net/)
 
 Use this Chef Automate Log Analytics integration to channel notification messages such as Chef Client run failures, into Azure Log Analytics.
 
