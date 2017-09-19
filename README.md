@@ -10,7 +10,7 @@ Read more about this integration in our [introductory blog post](https://blogs.c
 
 Simply press the [Deploy to Azure](https://azuredeploy.net/) button above to launch the template within your own Azure Subscription.  You will be asked to provide settings as below.
 
-![Template Parameters](images/template_parameters.png)
+![Template Parameters](images/template_parameters1.png)
 
 If you do not have an [Insights & Analytics](https://azure.microsoft.com/en-us/services/insight-analytics/) Workspace, this Azure Resource Manager template can provision you a new one.
 
