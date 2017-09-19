@@ -1,0 +1,190 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "createWorkspace": {
+            "type": "string",
+            "metadata": {
+                "description": "State if creating a new Insights & Analytics workspace. Default: yes"
+            },
+            "defaultValue": "yes",
+            "allowedValues": [
+                "no",
+                "yes"
+            ]
+        },
+        "workspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the workspace. This is for creation and/or reference. Default: Chef-Automate-Workspace"
+            },
+            "defaultValue": "Chef-Automate-Workspace"
+        },
+        "functionsAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the function app to create"
+            },
+            "defaultValue": "chef-automate-notify"
+        },
+        "functionsStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the storage account to create. Default: Generated based on the resource group name, deployment name and the App name"
+            },
+            "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id, deployment().name, parameters('functionsAppName'))]"
+        },
+        "functionsStorageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS",
+                "Premium_LRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type. default: Standard_LRS"
+            }
+        }
+    },
+    "variables": {
+        "unique": "[parameters('functionsStorageAccountName')]",
+        "uniqueShort": "[substring(variables('unique'), 0, 4)]",
+        "names": {
+            "storageAccount": "[variables('unique')]",
+            "function": "[concat(parameters('functionsAppName'), '-', variables('uniqueShort'))]",
+            "code": "relay-loganalytics",
+            "hostingPlan": "[concat(parameters('functionsAppName'), '-', variables('uniqueShort'), '-HostingPlan')]"
+        },
+        "oms": {
+            "create": "[parameters('createWorkspace')]",
+            "resourceGroup": "[resourceGroup().name]",
+            "workspaceName": "[parameters('workspaceName')]",
+            "dataRetention": {
+                "type": "int",
+                "defaultValue": 7,
+                "minValue": 7,
+                "maxValue": 730,
+                "metadata": {
+                    "description": "Number of days retention"
+                }
+            },
+            "serviceTier": "PerNode"
+        },
+        "code": "Ly8gI3IgIk5ld3RvbnNvZnQuSnNvbiINCg0KI2xvYWQgIndvcmtzcGFjZS5jc3giDQoNCnVzaW5nIFN5c3RlbTsNCnVzaW5nIFN5c3RlbS5OZXQ7DQp1c2luZyBTeXN0ZW0uU2VjdXJpdHkuQ3J5cHRvZ3JhcGh5Ow0KDQovKg0KT01TIFdvcmtzcGFjZSBWYXJpYWJsZXMNClRoZSB2YXJpYWJsZXMgdGhhdCBhcmUgcmVxdWlyZWQgdG8gY29tbXVuaWNhdGUgd2l0aCB0aGUgc3BlY2lmaWVkIE9NUyBkYXNoYm9hcmQgYXJlIHN0b3JlZCBpbiB0aGUgIndvcmtzcGFjZS5jc3giIGZpbGUuDQpUaGlzIHdhcyBkeW5hbWljYWxseSBjcmVhdGVkIHdoZW4gc29sdXRpb24gd2FzIGRlcGxveWVkLg0KDQpUaGUgbG9nVHlwZSBpcyBwYXNzZWQgdG8gdGhlIGZ1bmN0aW9uIGluIHRoZSBVUkwuIFRoaXMgaXMgc28gdGhhdCBkaWZmZXJlbnQgdHlwZXMgb2YgbG9ncyBjYW4gYmUgc2VudCB0byB0aGUgT01TIHdpdGggb25lIFVSTA0KICovDQoNCi8vIFlvdSBjYW4gdXNlIGFuIG9wdGlvbmFsIGZpZWxkIHRvIHNwZWNpZnkgdGhlIHRpbWVzdGFtcCBmcm9tIHRoZSBkYXRhLiBJZiB0aGUgdGltZSBmaWVsZCBpcyBub3Qgc3BlY2lmaWVkLCBMb2cgQW5hbHl0aWNzIGFzc3VtZXMgdGhlIHRpbWUgaXMgdGhlIG1lc3NhZ2UgaW5nZXN0aW9uIHRpbWUNCnN0YXRpYyBzdHJpbmcgVGltZVN0YW1wRmllbGQgPSAiIjsNCg0KcHVibGljIHN0YXRpYyBhc3luYyBUYXNrPEh0dHBSZXNwb25zZU1lc3NhZ2U+IFJ1bihIdHRwUmVxdWVzdE1lc3NhZ2UgcmVxLCBzdHJpbmcgbG9nVHlwZSwgVHJhY2VXcml0ZXIgbG9nKQ0Kew0KICAgIGxvZy5JbmZvKCJQcm9jZXNzaW5nIGluYm91bmQgbm90aWZpY2F0aW9uIGZyb20gQ2hlZiBBdXRvbWF0ZToiKTsNCiANCiAgICBkeW5hbWljIGRhdGEgPSBhd2FpdCByZXEuQ29udGVudC5SZWFkQXNTdHJpbmdBc3luYygpOw0KICAgIHN0cmluZyBkYXRhU3RyaW5nID0gZGF0YS5Ub1N0cmluZygpOw0KDQogICAgbG9nLkluZm8oIkluY29taW5nIERhdGEgaXM6ICIgKyBkYXRhU3RyaW5nICk7DQogDQogICAgLy8gQ3JlYXRlIGEgaGFzaCBmb3IgdGhlIEFQSSBzaWduYXR1cmUNCiAgICB2YXIgZGF0ZXN0cmluZyA9IERhdGVUaW1lLlV0Y05vdy5Ub1N0cmluZygiciIpOw0KICAgIHN0cmluZyBzdHJpbmdUb0hhc2ggPSAiUE9TVFxuIiArIGRhdGFTdHJpbmcuTGVuZ3RoICsgIlxuYXBwbGljYXRpb24vanNvblxuIiArICJ4LW1zLWRhdGU6IiArIGRhdGVzdHJpbmcgKyAiXG4vYXBpL2xvZ3MiOw0KICAgIHN0cmluZyBoYXNoZWRTdHJpbmcgPSBCdWlsZFNpZ25hdHVyZShzdHJpbmdUb0hhc2gsIHNoYXJlZEtleSk7DQogICAgc3RyaW5nIHNpZ25hdHVyZSA9ICJTaGFyZWRLZXkgIiArIGN1c3RvbWVySWQgKyAiOiIgKyBoYXNoZWRTdHJpbmc7DQogICAgbG9nLkluZm8oIlBvc3RpbmcgRGF0YTogIiArIGRhdGFTdHJpbmcpOw0KDQogICAgc3RyaW5nIHBvc3REYXRhUmVzcG9uc2UgPSBQb3N0RGF0YShzaWduYXR1cmUsIGRhdGVzdHJpbmcsIGRhdGFTdHJpbmcsIGN1c3RvbWVySWQsIGxvZ1R5cGUpOw0KICAgIGxvZy5JbmZvKCJQb3N0ZWQgRGF0YSBSZXNwb25zZTogIiArIHBvc3REYXRhUmVzcG9uc2UpOw0KDQogICAgcmV0dXJuIHJlcS5DcmVhdGVSZXNwb25zZShIdHRwU3RhdHVzQ29kZS5PSywgcG9zdERhdGFSZXNwb25zZSk7DQp9DQoNCg0KLy8gQnVpbGQgdGhlIEFQSSBzaWduYXR1cmUNCnB1YmxpYyBzdGF0aWMgc3RyaW5nIEJ1aWxkU2lnbmF0dXJlKHN0cmluZyBtZXNzYWdlLCBzdHJpbmcgc2VjcmV0KQ0Kew0KICAgIHZhciBlbmNvZGluZyA9IG5ldyBTeXN0ZW0uVGV4dC5BU0NJSUVuY29kaW5nKCk7DQogICAgYnl0ZVtdIGtleUJ5dGUgPSBDb252ZXJ0LkZyb21CYXNlNjRTdHJpbmcoc2VjcmV0KTsNCiAgICBieXRlW10gbWVzc2FnZUJ5dGVzID0gZW5jb2RpbmcuR2V0Qnl0ZXMobWVzc2FnZSk7DQogICAgdXNpbmcgKHZhciBobWFjc2hhMjU2ID0gbmV3IEhNQUNTSEEyNTYoa2V5Qnl0ZSkpDQogICAgew0KICAgICAgICAgICAgYnl0ZVtdIGhhc2ggPSBobWFjc2hhMjU2LkNvbXB1dGVIYXNoKG1lc3NhZ2VCeXRlcyk7DQogICAgICAgICAgICByZXR1cm4gQ29udmVydC5Ub0Jhc2U2NFN0cmluZyhoYXNoKTsNCiAgICB9DQp9DQoNCi8vIFNlbmQgYSByZXF1ZXN0IHRvIHRoZSBQT1NUIEFQSSBlbmRwb2ludA0KcHVibGljIHN0YXRpYyBzdHJpbmcgUG9zdERhdGEoc3RyaW5nIHNpZ25hdHVyZSwgc3RyaW5nIGRhdGUsIHN0cmluZyBqc29uLCBzdHJpbmcgY3VzdG9tZXJJRCwgc3RyaW5nIGxvZ1R5cGUpDQp7DQogICAgc3RyaW5nIHVybCA9ICJodHRwczovLyIgKyBjdXN0b21lcklEICsgIi5vZHMub3BpbnNpZ2h0cy5henVyZS5jb20vYXBpL2xvZ3M/YXBpLXZlcnNpb249MjAxNi0wNC0wMSI7DQogICAgdXNpbmcgKHZhciBjbGllbnQgPSBuZXcgV2ViQ2xpZW50KCkpDQogICAgew0KICAgICAgICBjbGllbnQuSGVhZGVycy5BZGQoSHR0cFJlcXVlc3RIZWFkZXIuQ29udGVudFR5cGUsICJhcHBsaWNhdGlvbi9qc29uIik7DQogICAgICAgIGNsaWVudC5IZWFkZXJzLkFkZCgiTG9nLVR5cGUiLCBsb2dUeXBlKTsNCiAgICAgICAgY2xpZW50LkhlYWRlcnMuQWRkKCJBdXRob3JpemF0aW9uIiwgc2lnbmF0dXJlKTsNCiAgICAgICAgY2xpZW50LkhlYWRlcnMuQWRkKCJ4LW1zLWRhdGUiLCBkYXRlKTsNCiAgICAgICAgY2xpZW50LkhlYWRlcnMuQWRkKCJ0aW1lLWdlbmVyYXRlZC1maWVsZCIsIFRpbWVTdGFtcEZpZWxkKTsNCiAgICAgICAgc3RyaW5nIHJlcGx5ID0gY2xpZW50LlVwbG9hZFN0cmluZyhuZXcgVXJpKHVybCksICJQT1NUIiwganNvbik7DQogICAgICAgIHJldHVybiAoInJlcGx5OiAiICsgcmVwbHkgKyAiVVJMOiAiICsgdXJsICsgICIgRGF0YTogIiArIGpzb24pOw0KICAgIH0NCn0NCg=="        
+    },
+    "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "name": "[variables('oms').workspaceName]",
+            "apiVersion": "2017-04-26-preview",
+            "location": "[resourceGroup().location]",
+            "condition": "[equals(variables('oms').create, 'yes')]",
+            "properties": {
+                "sku": {
+                    "Name": "[variables('oms').serviceTier]"
+                }
+            },
+            "resources": []
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('names').storageAccount]",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "accountType": "[parameters('functionsStorageAccountType')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2015-04-01",
+            "name": "[variables('names').hostingPlan]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[variables('names').hostingPlan]",
+                "computeMode": "Dynamic",
+                "sku": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2015-08-01",
+            "type": "Microsoft.Web/sites",
+            "name": "[variables('names').function]",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "properties": {
+                "name": "[variables('names').function]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('names').hostingPlan)]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('names').hostingPlan)]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('names').storageAccount)]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('oms').workspaceName)]"
+            ],
+            "resources": [
+                {
+                    "apiVersion": "2016-03-01",
+                    "name": "appsettings",
+                    "type": "config",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('names').function)]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('names').storageAccount)]"
+                    ],
+                    "properties": {
+                        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('names').storageAccount,';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('names').storageAccount), '2015-05-01-preview').key1,';')]",
+                        "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('names').storageAccount,';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('names').storageAccount), '2015-05-01-preview').key1,';')]",
+                        "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('names').storageAccount,';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('names').storageAccount), '2015-05-01-preview').key1,';')]",
+                        "WEBSITE_CONTENTSHARE": "[variables('names').function]",
+                        "FUNCTIONS_EXTENSION_VERSION": "latest"
+                    }
+                },
+                {
+                    "apiVersion": "2015-08-01",
+                    "name": "[variables('names').code]",
+                    "type": "functions",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('names').function)]",
+                        "appsettings"
+                    ],
+                    "properties": {
+                        "config": {
+                            "bindings": [
+                                {
+                                    "authLevel": "function",
+                                    "name": "req",
+                                    "type": "httpTrigger",
+                                    "direction": "in",
+                                    "methods": [
+                                        "post"
+                                    ],
+                                    "route": "{logType}"
+                                },
+                                {
+                                    "name": "res",
+                                    "type": "http",
+                                    "direction": "out"
+                                }
+                            ]
+                        },
+                        "files": {
+                            "run.csx": "[base64ToString(variables('code'))]",
+                            "workspace.csx": "[concat('static string sharedKey = \"', listKeys(resourceId(variables('oms').resourceGroup, 'Microsoft.OperationalInsights/workspaces', variables('oms').workspaceName), '2015-03-20').primarySharedKey, '\";\nstatic string customerId = \"', reference(resourceId(variables('oms').resourceGroup, 'Microsoft.OperationalInsights/workspaces', variables('oms').workspaceName), '2015-03-20').customerId, '\";')]"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "ChefClientRun_Webhook_Url": {
+            "type": "string",
+            "value": "[concat('https://', variables('names').function, '.azurewebsites.net/api/ChefClientRunFailure?code=', listsecrets(resourceId('Microsoft.Web/sites/functions', variables('names').function, variables('names').code), '2015-08-01').key)]"    
+        },
+        "Compliance_Webhook_Url": {
+            "type": "string",
+            "value": "[concat('https://', variables('names').function, '.azurewebsites.net/api/ComplianceFailure?code=', listsecrets(resourceId('Microsoft.Web/sites/functions', variables('names').function, variables('names').code), '2015-08-01').key)]"
+        }
+    }
+}
