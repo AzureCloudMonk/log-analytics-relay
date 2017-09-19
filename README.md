@@ -2,9 +2,9 @@
 
 [![Deploy to Azure](https://azuredeploy.net/deploybutton.svg)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchef-partners%2Flog-analytics-relay%2Fmaster%2Fazuredeploy.json)
 
-Use this Chef Automate Log Analytics integration to channel notification messages such as Chef Client run failures, into Azure Log Analytics.
+Use this Chef Automate Log Analytics integration to channel notification messages such as Chef Client run failures and Compliance failures, into Azure Log Analytics.
 
-Read more about this integration in our [introductory blog post](https://blogs.chef.io/tbc).
+Read more about this integration in our [introductory blog post](https://blogs.chef.io/).
 
 # How to deploy the template
 
