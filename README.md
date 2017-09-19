@@ -18,7 +18,7 @@ An Azure Function is deployed within your Subscription and two endpoint URLs are
 
 ![Deployment Outputs](images/deployment_outputs.png)
 
-Then,simply visit the Notifications tab within Chef Automate in order to add your custom notification to Chef Automate.
+Then, simply visit the Notifications tab within Chef Automate in order to add your custom notification to Chef Automate.
 
 ![Notifications view](images/notifications0.png)
 
