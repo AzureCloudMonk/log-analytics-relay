@@ -18,7 +18,7 @@
             "metadata": {
                 "description": "The name of the workspace. This is for creation and/or reference. Default: Chef-Automate-Workspace"
             },
-            "defaultValue": "Chef-Automate-Workspace"
+            "defaultValue": "chef-automate-workspace"
         },
         "functionsAppName": {
             "type": "string",
@@ -26,13 +26,6 @@
                 "description": "Name of the function app to create"
             },
             "defaultValue": "chef-automate-notify"
-        },
-        "functionsStorageAccountName": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the storage account to create. Default: Generated based on the resource group name, deployment name and the App name"
-            },
-            "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id, deployment().name, parameters('functionsAppName'))]"
         },
         "functionsStorageAccountType": {
             "type": "string",
@@ -44,12 +37,13 @@
                 "Premium_LRS"
             ],
             "metadata": {
-                "description": "Storage Account type. default: Standard_LRS"
+                "description": "Storage Account type for the Functions App. default: Standard_LRS"
             }
         }
     },
     "variables": {
-        "unique": "[parameters('functionsStorageAccountName')]",
+        "functionsStorageAccountName": "[uniqueString(subscription().subscriptionId, resourceGroup().id, deployment().name, parameters('functionsAppName'))]",
+        "unique": "[variables('functionsStorageAccountName')]",
         "uniqueShort": "[substring(variables('unique'), 0, 4)]",
         "names": {
             "storageAccount": "[variables('unique')]",
